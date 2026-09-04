@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>k6 Load Testing — ৩০ দিনের বাংলা কোর্স</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #0A0D13;
+  --bg-raised: #10141C;
+  --card: #12161F;
+  --card-border: #232A38;
+  --ink: #E7EAF0;
+  --ink-dim: #97A1B4;
+  --ink-faint: #5C6579;
+  --violet: #8B7CFF;
+  --violet-dim: #4E4590;
+  --amber: #FFB454;
+  --amber-dim: #6B5730;
+  --green: #6FD9A7;
+  --code-bg: #0C0F16;
+  --radius-card: 4px;
+  --radius-pill: 999px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Hind Siliguri','Space Grotesk',sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background:var(--violet-dim); color:#fff; }
+
+/* ---------- layout ---------- */
+.app{
+  display:grid;
+  grid-template-columns: 288px 1fr;
+  min-height:100vh;
+}
+@media (max-width: 900px){
+  .app{ grid-template-columns: 1fr; }
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--card-border);
+  padding:28px 18px 60px;
+  background:var(--bg-raised);
+}
+.sidebar::-webkit-scrollbar{ width:8px; }
+.sidebar::-webkit-scrollbar-thumb{ background:#242b3a; border-radius:8px; }
+
+.brand{
+  display:flex; align-items:center; gap:10px;
+  padding:0 8px 22px;
+  border-bottom:1px solid var(--card-border);
+  margin-bottom:18px;
+}
+.brand-mark{
+  width:30px; height:30px; border:1.5px solid var(--amber); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-weight:600; font-size:13px; color:var(--amber);
+  flex-shrink:0;
+}
+.brand-text{ font-family:'Space Grotesk',sans-serif; }
+.brand-text b{ display:block; font-size:14.5px; font-weight:600; letter-spacing:.01em; }
+.brand-text span{ display:block; font-size:11.5px; color:var(--ink-faint); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+
+.nav-week{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; color:var(--ink-faint);
+  padding:16px 10px 6px;
+  border-top:1px solid #1a2029;
+  margin-top:6px;
+}
+.nav-week:first-of-type{ border-top:none; margin-top:0; }
+
+.nav-day{
+  display:flex; align-items:baseline; gap:10px;
+  padding:6px 10px;
+  border-radius:5px;
+  color:var(--ink-dim);
+  text-decoration:none;
+  font-size:14px;
+  transition:background .12s ease, color .12s ease;
+}
+.nav-day:hover{ background:#171d29; color:var(--ink); }
+.nav-day.active{ background:#181425; color:var(--ink); }
+.nav-day.active .nav-num{ color:var(--amber); }
+.nav-num{
+  font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-faint);
+  flex-shrink:0; width:20px;
+}
+.nav-title{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.nav-extra-label{
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint);
+  padding:16px 10px 6px; border-top:1px solid #1a2029; margin-top:10px;
+}
+
+/* ---------- main ---------- */
+main{ padding: 0 0 120px; min-width:0; }
+
+.hero{
+  padding:64px 48px 40px;
+  max-width:840px;
+  border-bottom:1px solid var(--card-border);
+}
+@media (max-width:640px){ .hero{ padding:44px 22px 32px; } }
+
+.hero-kicker{
+  font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--amber);
+  display:flex; align-items:center; gap:10px; margin-bottom:18px;
+}
+.hero-kicker .dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(111,217,167,.15); }
+
+h1.hero-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  font-size:clamp(30px, 4.4vw, 44px);
+  line-height:1.18;
+  margin:0 0 20px;
+  letter-spacing:-.01em;
+}
+h1.hero-title em{ font-style:normal; color:var(--amber); }
+
+.hero-lede{
+  font-size:17px; color:var(--ink-dim); max-width:62ch; margin:0 0 14px;
+}
+.hero-lede strong{ color:var(--ink); font-weight:600; }
+
+.hero-note{
+  margin-top:26px; padding:14px 16px;
+  border:1px solid var(--amber-dim); border-left:3px solid var(--amber);
+  background:rgba(255,180,84,.06);
+  border-radius:3px;
+  font-size:14.5px; color:var(--ink-dim);
+}
+.hero-note b{ color:var(--amber); font-weight:600; }
+
+.hero-stats{
+  display:flex; gap:0; margin-top:34px; border-top:1px solid var(--card-border);
+}
+.hero-stat{
+  flex:1; padding:16px 18px 0; border-right:1px solid var(--card-border);
+}
+.hero-stat:last-child{ border-right:none; }
+.hero-stat .n{ font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; color:var(--violet); }
+.hero-stat .l{ font-size:12.5px; color:var(--ink-faint); margin-top:2px; }
+
+.roadmap-wrap{ padding:8px 48px 40px; max-width:840px; }
+@media (max-width:640px){ .roadmap-wrap{ padding:8px 22px 32px; } }
+.roadmap-wrap h3{ font-family:'Space Grotesk',sans-serif; font-size:15px; color:var(--ink-dim); font-weight:600; margin: 24px 0 12px;}
+
+/* ---------- content sections ---------- */
+.section-wrap{ padding: 0 48px; max-width:840px; }
+@media (max-width:640px){ .section-wrap{ padding:0 22px; } }
+
+.week-marker{
+  margin: 46px 0 22px; padding-top:2px;
+  display:flex; align-items:center; gap:14px;
+}
+.week-marker span{
+  font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--amber);
+  white-space:nowrap;
+}
+.week-marker::after{
+  content:''; height:1px; flex:1; background:var(--card-border);
+}
+
+.day-card{
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-card);
+  background:var(--card);
+  margin-bottom:22px;
+  overflow:hidden;
+  scroll-margin-top:24px;
+}
+.day-head{
+  display:flex; align-items:center; gap:16px;
+  padding:20px 22px;
+  border-bottom:1px solid var(--card-border);
+  background:linear-gradient(180deg, rgba(139,124,255,.05), transparent);
+}
+.day-num{
+  font-family:'JetBrains Mono',monospace; font-weight:600; font-size:14px;
+  color:var(--amber);
+  border:1px solid var(--amber-dim);
+  padding:4px 9px;
+  border-radius:3px;
+  flex-shrink:0;
+}
+.day-head h2{
+  font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600;
+  margin:0; flex:1; min-width:0; color:var(--ink);
+  letter-spacing:-.005em;
+}
+.bonus-card .day-num{ color:var(--green); border-color:#2d5f47; }
+
+.copy-btn{
+  display:flex; align-items:center; gap:6px;
+  background:transparent;
+  border:1px solid var(--card-border);
+  color:var(--ink-dim);
+  padding:7px 12px;
+  border-radius:5px;
+  font-family:'JetBrains Mono',monospace; font-size:12.5px;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:border-color .15s ease, color .15s ease, background .15s ease;
+}
+.copy-btn:hover{ border-color:var(--violet); color:var(--ink); background:rgba(139,124,255,.08); }
+.copy-btn.copied{ border-color:var(--green); color:var(--green); background:rgba(111,217,167,.08); }
+.copy-btn .icon-copy{ width:14px; height:14px; }
+
+.day-body{ padding:20px 22px 26px; }
+.day-body h3{
+  font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; color:var(--ink);
+  margin:26px 0 10px;
+}
+.day-body h3:first-child{ margin-top:0; }
+.day-body h4{
+  font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:600; color:var(--violet);
+  margin:22px 0 8px;
+}
+.day-body h4:first-child{ margin-top:0; }
+.day-body h5{ font-size:14px; color:var(--ink-dim); margin:16px 0 6px; font-weight:600; }
+.day-body p{ margin:0 0 12px; color:var(--ink-dim); font-size:15px; }
+.day-body p code.inline, .day-body li code.inline{
+  font-family:'JetBrains Mono',monospace; font-size:.88em;
+  background:#1a2130; color:var(--amber);
+  padding:1.5px 6px; border-radius:3px;
+}
+.day-body strong{ color:var(--ink); font-weight:600; }
+.day-body ul, .day-body ol{ margin:0 0 14px; padding-left:22px; color:var(--ink-dim); font-size:15px; }
+.day-body li{ margin-bottom:5px; }
+.day-body blockquote{
+  margin:14px 0; padding:10px 16px;
+  border-left:3px solid var(--violet);
+  background:rgba(139,124,255,.07);
+  color:var(--ink-dim);
+  font-size:14.5px;
+  border-radius:0 3px 3px 0;
+}
+
+.code-block{
+  margin:10px 0 16px;
+  border:1px solid #1e2531;
+  border-radius:4px;
+  overflow:hidden;
+  background:var(--code-bg);
+}
+.code-label{
+  font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.04em;
+  color:var(--ink-faint);
+  padding:6px 12px;
+  border-bottom:1px solid #1e2531;
+  background:#0e121a;
+}
+.code-block pre{
+  margin:0; padding:14px 16px;
+  overflow-x:auto;
+}
+.code-block code{
+  font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.65;
+  color:#C8D0E0; white-space:pre;
+}
+
+/* footer */
+.page-footer{
+  max-width:840px; margin:60px 48px 0; padding-top:24px;
+  border-top:1px solid var(--card-border);
+  color:var(--ink-faint); font-size:13px;
+  font-family:'JetBrains Mono',monospace;
+}
+@media (max-width:640px){ .page-footer{ margin:60px 22px 0; } }
+
+/* back to top */
+.top-btn{
+  position:fixed; right:24px; bottom:24px;
+  width:42px; height:42px; border-radius:50%;
+  background:var(--card); border:1px solid var(--card-border);
+  color:var(--ink-dim);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:0; pointer-events:none;
+  transition:opacity .2s ease, border-color .2s ease, color .2s ease;
+  z-index:40;
+}
+.top-btn.show{ opacity:1; pointer-events:auto; }
+.top-btn:hover{ border-color:var(--violet); color:var(--ink); }
+
+/* ---------- mobile top bar ---------- */
+.mobile-bar{ display:none; }
+@media (max-width:900px){
+  .mobile-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    position:sticky; top:0; z-index:35;
+    background:var(--bg-raised); border-bottom:1px solid var(--card-border);
+    padding:13px 16px;
+  }
+  .mobile-bar .brand{ border-bottom:none; margin-bottom:0; padding:0; }
+  .mobile-bar .brand-mark{ width:26px; height:26px; font-size:11px; }
+  .mobile-bar .brand-text b{ font-size:13px; }
+  .mobile-bar .brand-text span{ font-size:10px; }
+  .mobile-toggle{
+    display:flex; align-items:center; gap:7px;
+    background:transparent;
+    border:1px solid var(--card-border);
+    color:var(--ink-dim);
+    padding:8px 13px;
+    border-radius:6px;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    cursor:pointer;
+  }
+  .mobile-toggle:hover{ border-color:var(--violet); color:var(--ink); }
+  .mobile-toggle svg{ width:15px; height:15px; }
+}
+
+/* ---------- drawer (mobile sidebar) ---------- */
+.drawer-overlay{
+  display:none;
+  position:fixed; inset:0; z-index:45;
+  background:rgba(6,8,12,.6);
+  backdrop-filter:blur(2px);
+  opacity:0;
+  transition:opacity .22s ease;
+}
+.drawer-overlay.open{ opacity:1; }
+
+@media (max-width:900px){
+  .drawer-overlay.visible{ display:block; }
+
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0;
+    width:82vw; max-width:320px; height:100vh;
+    z-index:46;
+    transform:translateX(-100%);
+    transition:transform .26s cubic-bezier(.4,0,.2,1);
+    box-shadow:none;
+  }
+  .sidebar.open{
+    transform:translateX(0);
+    box-shadow:12px 0 32px rgba(0,0,0,.4);
+  }
+
+  .drawer-close{
+    display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; margin-left:auto;
+    border:1px solid var(--card-border); border-radius:6px;
+    color:var(--ink-dim); background:transparent; cursor:pointer;
+  }
+  .drawer-close:hover{ border-color:var(--violet); color:var(--ink); }
+  .drawer-close svg{ width:15px; height:15px; }
+}
+@media (min-width:901px){
+  .drawer-close{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="mobile-bar">
+    <div class="brand">
+      <div class="brand-mark">k6</div>
+      <div class="brand-text">
+        <b>Load Testing</b>
+        <span>30-DAY · বাংলা</span>
+      </div>
+    </div>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Open day list" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>দিন তালিকা</span>
+    </button>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">k6</div>
+      <div class="brand-text">
+        <b>Load Testing</b>
+        <span>30-DAY · বাংলা</span>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <a href="#day-1" class="nav-day" data-day="1"><span class="nav-num">01</span><span class="nav-title">Performance Testing Fundamentals</span></a>
+<a href="#day-2" class="nav-day" data-day="2"><span class="nav-num">02</span><span class="nav-title">JavaScript for k6</span></a>
+<a href="#day-3" class="nav-day" data-day="3"><span class="nav-num">03</span><span class="nav-title">k6 Install + First Test</span></a>
+<a href="#day-4" class="nav-day" data-day="4"><span class="nav-num">04</span><span class="nav-title">VUs, Duration এবং sleep()</span></a>
+<a href="#day-5" class="nav-day" data-day="5"><span class="nav-num">05</span><span class="nav-title">k6 Metrics বুঝুন</span></a>
+<a href="#day-6" class="nav-day" data-day="6"><span class="nav-num">06</span><span class="nav-title">Checks</span></a>
+<a href="#day-7" class="nav-day" data-day="7"><span class="nav-num">07</span><span class="nav-title">Thresholds</span></a>
+<a href="#day-8" class="nav-day" data-day="8"><span class="nav-num">08</span><span class="nav-title">GET API Testing</span></a>
+<a href="#day-9" class="nav-day" data-day="9"><span class="nav-num">09</span><span class="nav-title">POST Request</span></a>
+<a href="#day-10" class="nav-day" data-day="10"><span class="nav-num">10</span><span class="nav-title">JSON Response Parsing</span></a>
+<a href="#day-11" class="nav-day" data-day="11"><span class="nav-num">11</span><span class="nav-title">Authentication</span></a>
+<a href="#day-12" class="nav-day" data-day="12"><span class="nav-num">12</span><span class="nav-title">Environment Variables</span></a>
+<a href="#day-13" class="nav-day" data-day="13"><span class="nav-num">13</span><span class="nav-title">Groups &amp; Tags</span></a>
+<a href="#day-14" class="nav-day" data-day="14"><span class="nav-num">14</span><span class="nav-title">Test Lifecycle</span></a>
+<a href="#day-15" class="nav-day" data-day="15"><span class="nav-num">15</span><span class="nav-title">Scenarios</span></a>
+<a href="#day-16" class="nav-day" data-day="16"><span class="nav-num">16</span><span class="nav-title">Executors</span></a>
+<a href="#day-17" class="nav-day" data-day="17"><span class="nav-num">17</span><span class="nav-title">Ramping VUs</span></a>
+<a href="#day-18" class="nav-day" data-day="18"><span class="nav-num">18</span><span class="nav-title">Arrival Rate Testing</span></a>
+<a href="#day-19" class="nav-day" data-day="19"><span class="nav-num">19</span><span class="nav-title">Smoke Test</span></a>
+<a href="#day-20" class="nav-day" data-day="20"><span class="nav-num">20</span><span class="nav-title">Load Test</span></a>
+<a href="#day-21" class="nav-day" data-day="21"><span class="nav-num">21</span><span class="nav-title">Stress + Spike + Soak</span></a>
+<a href="#day-22" class="nav-day" data-day="22"><span class="nav-num">22</span><span class="nav-title">Real User Journey</span></a>
+<a href="#day-23" class="nav-day" data-day="23"><span class="nav-num">23</span><span class="nav-title">Multiple User Behaviours</span></a>
+<a href="#day-24" class="nav-day" data-day="24"><span class="nav-num">24</span><span class="nav-title">Test Data</span></a>
+<a href="#day-25" class="nav-day" data-day="25"><span class="nav-num">25</span><span class="nav-title">Custom Metrics</span></a>
+<a href="#day-26" class="nav-day" data-day="26"><span class="nav-num">26</span><span class="nav-title">Result Analysis</span></a>
+<a href="#day-27" class="nav-day" data-day="27"><span class="nav-num">27</span><span class="nav-title">Grafana + Prometheus</span></a>
+<a href="#day-28" class="nav-day" data-day="28"><span class="nav-num">28</span><span class="nav-title">Docker + k6</span></a>
+<a href="#day-29" class="nav-day" data-day="29"><span class="nav-num">29</span><span class="nav-title">CI/CD + Automated Performance Gate</span></a>
+<a href="#day-30" class="nav-day" data-day="30"><span class="nav-num">30</span><span class="nav-title">Final Real-World Project</span></a>
+    <div class="nav-extra-label">অতিরিক্ত</div>
+    <a href="#bonus-0" class="nav-day"><span class="nav-num">＋</span><span class="nav-title">Browser Testing</span></a>
+    <a href="#bonus-1" class="nav-day"><span class="nav-num">＋</span><span class="nav-title">প্রতিদিন কীভাবে পড়বেন</span></a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="hero-kicker"><span class="dot"></span>COMPLETE COURSE · DAY 1–30</div>
+      <h1 class="hero-title">k6 দিয়ে Load Testing শিখুন,<br><em>শূন্য থেকে প্রোডাকশন পর্যন্ত।</em></h1>
+      <p class="hero-lede">৩০ দিনের এই বাংলা কোর্সে <strong>script লেখা</strong> থেকে শুরু করে <strong>API load test design, result analysis, bottleneck detection, Grafana monitoring এবং CI/CD integration</strong> পর্যন্ত হাতে-কলমে শেখানো হয়েছে।</p>
+      <p class="hero-lede">বর্তমান k6-এ scenarios, multiple executors, thresholds, custom metrics, browser testing, environment variables এবং Prometheus/Grafana output — সবই অফিসিয়ালভাবে সাপোর্টেড।</p>
+      <div class="hero-note"><b>গুরুত্বপূর্ণ —</b> নিজের application, staging environment, অথবা যেটিতে স্পষ্ট permission আছে সেটিতেই heavy load test করবেন। Public/third-party website-এ stress test করবেন না।</div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="n">30</div><div class="l">দিন</div></div>
+        <div class="hero-stat"><div class="n">04</div><div class="l">সপ্তাহ</div></div>
+        <div class="hero-stat"><div class="n">02</div><div class="l">বোনাস মডিউল</div></div>
+        <div class="hero-stat"><div class="n">1</div><div class="l">ফাইনাল প্রজেক্ট</div></div>
+      </div>
+    </header>
+
+    <div class="roadmap-wrap">
+      <h3>রোডম্যাপ</h3>
+      <h3>Course শেষ হলে আপনি পারবেন</h3>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Performance Testing Concepts
+        ↓
+k6 Script Writing
+        ↓
+REST API Testing
+        ↓
+Authentication Testing
+        ↓
+Checks + Thresholds
+        ↓
+Scenarios
+        ↓
+Ramping / Arrival Rate
+        ↓
+Smoke / Load / Stress / Spike / Soak
+        ↓
+Real User Journey
+        ↓
+Custom Metrics
+        ↓
+Result Analysis
+        ↓
+Grafana + Prometheus
+        ↓
+Docker
+        ↓
+CI/CD
+        ↓
+Production-style Performance Test</code></pre></div>
+    </div>
+
+    <div class="section-wrap">
+      
+<div class="week-marker" id="week-1"><span>সপ্তাহ ১ · ফান্ডামেন্টালস</span></div>
+<section class="day-card" id="day-1">
+  <div class="day-head">
+    <div class="day-num">Day 01</div>
+    <h2>Performance Testing Fundamentals</h2>
+    <button class="copy-btn" data-target="day-1" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>আজ coding না করে concept বুঝবেন।</p>
+<h4>শিখবেন</h4>
+<ul>
+<li>Performance Testing কী</li>
+<li>Load Testing কী</li>
+<li>Stress Testing কী</li>
+<li>Spike Testing কী</li>
+<li>Soak Testing কী</li>
+<li>Smoke Testing কী</li>
+<li>Scalability কী</li>
+<li>Bottleneck কী</li>
+</ul>
+<h4>Example</h4>
+<p>ধরুন আপনার API:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>GET /api/products</code></pre></div>
+<p>Normal traffic:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>20 requests/sec</code></pre></div>
+<p>Campaign launch হলে:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>500 requests/sec</code></pre></div>
+<p>প্রশ্ন হচ্ছে:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Server কি 500 RPS নিতে পারবে?
+
+Response time কত হবে?
+
+Database slow হবে?
+
+Error আসবে?
+
+CPU/RAM কত বাড়বে?</code></pre></div>
+<h4>আজকের গুরুত্বপূর্ণ terms</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>VU = Virtual User
+RPS = Requests Per Second
+Latency = Delay
+Response Time = Request complete হতে সময়
+Throughput = System কত কাজ process করছে
+Error Rate = কত % request fail করছে
+p95 = 95% request এই সময়ের মধ্যে complete
+p99 = 99% request এই সময়ের মধ্যে complete</code></pre></div>
+<h4>Practice</h4>
+<p>নিজের ভাষায় লিখুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Load Test:
+Stress Test:
+Spike Test:
+Soak Test:</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-2">
+  <div class="day-head">
+    <div class="day-num">Day 02</div>
+    <h2>JavaScript for k6</h2>
+    <button class="copy-btn" data-target="day-2" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>k6-এর জন্য পুরো JavaScript শেখার দরকার নেই।</p>
+<p>শিখুন:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const
+let
+
+function
+
+if / else
+
+for
+
+array
+
+object
+
+JSON
+
+template literals
+
+import/export</code></pre></div>
+<h4>Example</h4>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const user = {
+  email: &#x27;test@example.com&#x27;,
+  password: &#x27;123456&#x27;,
+};
+
+console.log(user.email);</code></pre></div>
+<p>Array:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const products = [1, 2, 3, 4];
+
+for (const product of products) {
+  console.log(product);
+}</code></pre></div>
+<p>Function:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>function getUser() {
+  return {
+    id: 1,
+    name: &#x27;Test User&#x27;,
+  };
+}</code></pre></div>
+<h4>Practice</h4>
+<p>একটি object বানান:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const testConfig = {
+  users: 10,
+  duration: &#x27;30s&#x27;,
+  baseUrl: &#x27;https://example.com&#x27;,
+};</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-3">
+  <div class="day-head">
+    <div class="day-num">Day 03</div>
+    <h2>k6 Install + First Test</h2>
+    <button class="copy-btn" data-target="day-3" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>k6 Windows, Linux, macOS, Docker এবং standalone binary দিয়ে চালানো যায়।</p>
+<h4>Windows</h4>
+<p>Winget:</p>
+<div class="code-block" data-lang="powershell"><div class="code-label">powershell</div><pre><code>winget install k6 --source winget</code></pre></div>
+<p>Chocolatey:</p>
+<div class="code-block" data-lang="powershell"><div class="code-label">powershell</div><pre><code>choco install k6</code></pre></div>
+<p>Check:</p>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>k6 version</code></pre></div>
+<h4>Ubuntu</h4>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>sudo apt-get update
+sudo apt-get install k6</code></pre></div>
+<h4>Docker</h4>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>docker pull grafana/k6</code></pre></div>
+<h4>First script</h4>
+<p><code class="inline">first-test.js</code></p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import http from &#x27;k6/http&#x27;;
+
+export default function () {
+  http.get(&#x27;https://test.k6.io&#x27;);
+}</code></pre></div>
+<p>Run:</p>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>k6 run first-test.js</code></pre></div>
+<p>k6-এর standard run syntax <code class="inline">k6 run script.js</code>।</p>
+<h4>Practice</h4>
+<p>তিনটি GET endpoint call করুন।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-4">
+  <div class="day-head">
+    <div class="day-num">Day 04</div>
+    <h2>VUs, Duration এবং sleep()</h2>
+    <button class="copy-btn" data-target="day-4" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import http from &#x27;k6/http&#x27;;
+import { sleep } from &#x27;k6&#x27;;
+
+export const options = {
+  vus: 10,
+  duration: &#x27;30s&#x27;,
+};
+
+export default function () {
+  http.get(&#x27;https://test.k6.io&#x27;);
+
+  sleep(1);
+}</code></pre></div>
+<p>এখানে:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>vus: 10</code></pre></div>
+<p>মানে 10 Virtual Users।</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>duration: 30s</code></pre></div>
+<p>মানে 30 seconds test চলবে।</p>
+<h4><code class="inline">sleep(1)</code> কেন?</h4>
+<p>Real user সাধারণত:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Page open
+↓
+কিছু পড়ে
+↓
+Next action</code></pre></div>
+<p>এক milliseconds-এর মধ্যে একের পর এক click করে না।</p>
+<p>এজন্য think time simulate করা হয়।</p>
+<h4>Practice</h4>
+<p>চালান:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>1 VU
+10 VU
+20 VU
+50 VU</code></pre></div>
+<p>Output compare করুন।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-5">
+  <div class="day-head">
+    <div class="day-num">Day 05</div>
+    <h2>k6 Metrics বুঝুন</h2>
+    <button class="copy-btn" data-target="day-5" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>k6 automatically built-in metrics collect করে এবং metrics broadly Counter, Gauge, Rate ও Trend ধরনের হতে পারে।</p>
+<p>সবচেয়ে গুরুত্বপূর্ণ:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>http_reqs
+http_req_duration
+http_req_failed
+iteration_duration
+iterations
+vus
+vus_max</code></pre></div>
+<p>Request timing:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>http_req_blocked
+http_req_connecting
+http_req_tls_handshaking
+http_req_sending
+http_req_waiting
+http_req_receiving</code></pre></div>
+<h4>সবচেয়ে গুরুত্বপূর্ণ</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>http_req_duration</code></pre></div>
+<p>এবং:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>p(90)
+p(95)
+p(99)</code></pre></div>
+<p>ধরুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>avg = 200ms
+p95 = 900ms
+p99 = 2500ms</code></pre></div>
+<p>Average ভালো মনে হলেও কিছু user খুব slow response পাচ্ছে।</p>
+<h4>Practice</h4>
+<p>একটি test run করে লিখুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Requests:
+Average:
+p90:
+p95:
+Error rate:</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-6">
+  <div class="day-head">
+    <div class="day-num">Day 06</div>
+    <h2>Checks</h2>
+    <button class="copy-btn" data-target="day-6" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Checks functional validation করে।</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import http from &#x27;k6/http&#x27;;
+import { check } from &#x27;k6&#x27;;
+
+export default function () {
+  const response = http.get(&#x27;https://test.k6.io&#x27;);
+
+  check(response, {
+    &#x27;status is 200&#x27;: (r) =&gt; r.status === 200,
+  });
+}</code></pre></div>
+<p>Multiple:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>check(response, {
+  &#x27;status 200&#x27;: (r) =&gt; r.status === 200,
+  &#x27;body exists&#x27;: (r) =&gt; r.body.length &gt; 0,
+  &#x27;under 500ms&#x27;: (r) =&gt; r.timings.duration &lt; 500,
+});</code></pre></div>
+<h4>মনে রাখবেন</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Check fail
+≠
+Automatically entire test fail</code></pre></div>
+<p>Test pass/fail policy-এর জন্য Threshold ব্যবহার করবেন।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-7">
+  <div class="day-head">
+    <div class="day-num">Day 07</div>
+    <h2>Thresholds</h2>
+    <button class="copy-btn" data-target="day-7" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এটি k6-এর সবচেয়ে গুরুত্বপূর্ণ concepts-এর একটি।</p>
+<p>Threshold হচ্ছে performance-এর <strong>pass/fail criteria</strong>। Threshold fail হলে test failed status নিয়ে শেষ হতে পারে।</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  thresholds: {
+    http_req_failed: [&#x27;rate&lt;0.01&#x27;],
+    http_req_duration: [&#x27;p(95)&lt;500&#x27;],
+  },
+};</code></pre></div>
+<p>মানে:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Error rate &lt; 1%
+
+95% requests &lt; 500ms</code></pre></div>
+<p>আরও:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>thresholds: {
+  checks: [&#x27;rate&gt;0.99&#x27;],
+  http_req_duration: [
+    &#x27;p(90)&lt;300&#x27;,
+    &#x27;p(95)&lt;500&#x27;,
+    &#x27;p(99)&lt;1000&#x27;,
+  ],
+}</code></pre></div>
+<h4>Week 1 Project</h4>
+<p>বানান:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>GET API Load Test
+20 VUs
+1 minute
+
+Rules:
+p95 &lt; 500ms
+error &lt; 1%
+status = 200</code></pre></div>
+  </div>
+</section>
+
+<div class="week-marker" id="week-8"><span>সপ্তাহ ২ · API লোড টেস্টিং</span></div>
+<section class="day-card" id="day-8">
+  <div class="day-head">
+    <div class="day-num">Day 08</div>
+    <h2>GET API Testing</h2>
+    <button class="copy-btn" data-target="day-8" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Structure করুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>k6-project/
+│
+├── tests/
+│   └── products.js
+│
+├── config/
+│
+└── data/</code></pre></div>
+<p>Test:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import http from &#x27;k6/http&#x27;;
+import { check, sleep } from &#x27;k6&#x27;;
+
+const BASE_URL = &#x27;https://api.example.com&#x27;;
+
+export default function () {
+  const res = http.get(`${BASE_URL}/products`);
+
+  check(res, {
+    &#x27;products loaded&#x27;: (r) =&gt; r.status === 200,
+  });
+
+  sleep(1);
+}</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-9">
+  <div class="day-head">
+    <div class="day-num">Day 09</div>
+    <h2>POST Request</h2>
+    <button class="copy-btn" data-target="day-9" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import http from &#x27;k6/http&#x27;;
+import { check } from &#x27;k6&#x27;;
+
+export default function () {
+
+  const payload = JSON.stringify({
+    email: &#x27;test@example.com&#x27;,
+    password: &#x27;password123&#x27;,
+  });
+
+  const params = {
+    headers: {
+      &#x27;Content-Type&#x27;: &#x27;application/json&#x27;,
+    },
+  };
+
+  const res = http.post(
+    &#x27;https://api.example.com/login&#x27;,
+    payload,
+    params
+  );
+
+  check(res, {
+    &#x27;login success&#x27;: (r) =&gt; r.status === 200,
+  });
+}</code></pre></div>
+<p>শিখুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>GET
+POST
+PUT
+PATCH
+DELETE</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-10">
+  <div class="day-head">
+    <div class="day-num">Day 10</div>
+    <h2>JSON Response Parsing</h2>
+    <button class="copy-btn" data-target="day-10" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>API:</p>
+<div class="code-block" data-lang="json"><div class="code-label">json</div><pre><code>{
+  &quot;user&quot;: {
+    &quot;id&quot;: 25
+  },
+  &quot;token&quot;: &quot;abc123&quot;
+}</code></pre></div>
+<p>k6:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const body = response.json();
+
+console.log(body.token);</code></pre></div>
+<p>অথবা:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const token = response.json(&#x27;token&#x27;);</code></pre></div>
+<p>Check:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>check(response, {
+  &#x27;token returned&#x27;: (r) =&gt; r.json(&#x27;token&#x27;) !== undefined,
+});</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-11">
+  <div class="day-head">
+    <div class="day-num">Day 11</div>
+    <h2>Authentication</h2>
+    <button class="copy-btn" data-target="day-11" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Real-world flow:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Login
+ ↓
+Get Token
+ ↓
+Profile
+ ↓
+Products</code></pre></div>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const loginRes = http.post(
+  `${BASE_URL}/login`,
+  JSON.stringify({
+    email: &#x27;test@example.com&#x27;,
+    password: &#x27;123456&#x27;,
+  }),
+  {
+    headers: {
+      &#x27;Content-Type&#x27;: &#x27;application/json&#x27;,
+    },
+  }
+);
+
+const token = loginRes.json(&#x27;token&#x27;);
+
+const params = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
+
+http.get(`${BASE_URL}/profile`, params);</code></pre></div>
+<h4>Practice flow</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Login
+→ Profile
+→ Orders</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-12">
+  <div class="day-head">
+    <div class="day-num">Day 12</div>
+    <h2>Environment Variables</h2>
+    <button class="copy-btn" data-target="day-12" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Hardcode করবেন না:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const BASE_URL = &#x27;https://production.com&#x27;;</code></pre></div>
+<p>বরং:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const BASE_URL = __ENV.BASE_URL;</code></pre></div>
+<p>Run:</p>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>k6 run -e BASE_URL=https://staging.example.com test.js</code></pre></div>
+<p>k6 script environment variables <code class="inline">__ENV</code> object দিয়ে access করতে পারে।</p>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const BASE_URL = __ENV.BASE_URL;
+const EMAIL = __ENV.EMAIL;
+const PASSWORD = __ENV.PASSWORD;</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-13">
+  <div class="day-head">
+    <div class="day-num">Day 13</div>
+    <h2>Groups &amp; Tags</h2>
+    <button class="copy-btn" data-target="day-13" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Complex test organize করুন।</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import { group } from &#x27;k6&#x27;;
+
+export default function () {
+
+  group(&#x27;Authentication&#x27;, () =&gt; {
+    // login
+  });
+
+  group(&#x27;Products&#x27;, () =&gt; {
+    // product APIs
+  });
+
+  group(&#x27;Checkout&#x27;, () =&gt; {
+    // checkout APIs
+  });
+}</code></pre></div>
+<p>Groups request/user actions organize করতে সাহায্য করে এবং tags results filter করতে কাজে লাগে।</p>
+<p>Tags:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>http.get(`${BASE_URL}/products`, {
+  tags: {
+    endpoint: &#x27;products&#x27;,
+  },
+});</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-14">
+  <div class="day-head">
+    <div class="day-num">Day 14</div>
+    <h2>Test Lifecycle</h2>
+    <button class="copy-btn" data-target="day-14" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>k6 lifecycle:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Init
+ ↓
+setup()
+ ↓
+VU Code
+ ↓
+teardown()</code></pre></div>
+<p>Official lifecycle-এ init, optional <code class="inline">setup()</code>, VU execution এবং optional <code class="inline">teardown()</code> stages আছে।</p>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export function setup() {
+  return {
+    token: &#x27;example&#x27;,
+  };
+}
+
+export default function (data) {
+  console.log(data.token);
+}
+
+export function teardown(data) {
+  console.log(&#x27;Test completed&#x27;);
+}</code></pre></div>
+<h4>Week 2 Project</h4>
+<p>Test করুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Login
+↓
+Profile
+↓
+Product List
+↓
+Product Details</code></pre></div>
+<p>Requirements:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>20 users
+2 minutes
+p95 &lt; 500ms
+errors &lt; 1%</code></pre></div>
+  </div>
+</section>
+
+<div class="week-marker" id="week-15"><span>সপ্তাহ ৩ · ওয়ার্কলোড মডেলিং</span></div>
+<section class="day-card" id="day-15">
+  <div class="day-head">
+    <div class="day-num">Day 15</div>
+    <h2>Scenarios</h2>
+    <button class="copy-btn" data-target="day-15" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Basic:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>vus: 100,
+duration: &#x27;5m&#x27;</code></pre></div>
+<p>এর চেয়ে professional approach:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  scenarios: {
+    browsing_users: {
+      executor: &#x27;constant-vus&#x27;,
+      vus: 20,
+      duration: &#x27;1m&#x27;,
+    },
+  },
+};</code></pre></div>
+<p>Scenarios দিয়ে আলাদা traffic pattern এবং আলাদা test function model করা যায়।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-16">
+  <div class="day-head">
+    <div class="day-num">Day 16</div>
+    <h2>Executors</h2>
+    <button class="copy-btn" data-target="day-16" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এগুলো শিখবেন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>shared-iterations
+
+per-vu-iterations
+
+constant-vus
+
+ramping-vus
+
+constant-arrival-rate
+
+ramping-arrival-rate</code></pre></div>
+<p>এগুলোই বর্তমান official scenario executor families।</p>
+<h4>Example</h4>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>scenarios: {
+  users: {
+    executor: &#x27;constant-vus&#x27;,
+    vus: 50,
+    duration: &#x27;2m&#x27;,
+  },
+}</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-17">
+  <div class="day-head">
+    <div class="day-num">Day 17</div>
+    <h2>Ramping VUs</h2>
+    <button class="copy-btn" data-target="day-17" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Traffic:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>0
+↓
+20
+↓
+100
+↓
+200
+↓
+100
+↓
+0</code></pre></div>
+<p>Script:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  scenarios: {
+    load_test: {
+      executor: &#x27;ramping-vus&#x27;,
+
+      startVUs: 0,
+
+      stages: [
+        { duration: &#x27;30s&#x27;, target: 20 },
+        { duration: &#x27;1m&#x27;, target: 100 },
+        { duration: &#x27;2m&#x27;, target: 100 },
+        { duration: &#x27;30s&#x27;, target: 0 },
+      ],
+    },
+  },
+};</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-18">
+  <div class="day-head">
+    <div class="day-num">Day 18</div>
+    <h2>Arrival Rate Testing</h2>
+    <button class="copy-btn" data-target="day-18" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এখন VUs না, request/work rate দিয়ে load model করবেন।</p>
+<p>Example target:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>100 iterations/sec</code></pre></div>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  scenarios: {
+    api_load: {
+      executor: &#x27;constant-arrival-rate&#x27;,
+
+      rate: 100,
+      timeUnit: &#x27;1s&#x27;,
+
+      duration: &#x27;1m&#x27;,
+
+      preAllocatedVUs: 50,
+      maxVUs: 200,
+    },
+  },
+};</code></pre></div>
+<p>এখানে লক্ষ্য:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>প্রতি second প্রায় 100 iterations start করা</code></pre></div>
+<p>এটি অনেক API workload-এর জন্য VU-only modelling-এর চেয়ে useful হতে পারে।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-19">
+  <div class="day-head">
+    <div class="day-num">Day 19</div>
+    <h2>Smoke Test</h2>
+    <button class="copy-btn" data-target="day-19" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Smoke test প্রথমে করবেন।</p>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  vus: 2,
+  duration: &#x27;30s&#x27;,
+};</code></pre></div>
+<p>Purpose:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Script কাজ করছে?
+
+Authentication কাজ করছে?
+
+Endpoint ঠিক আছে?
+
+Checks pass করছে?</code></pre></div>
+<p>Large load দেওয়ার আগে smoke test করবেন।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-20">
+  <div class="day-head">
+    <div class="day-num">Day 20</div>
+    <h2>Load Test</h2>
+    <button class="copy-btn" data-target="day-20" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Expected normal traffic simulate করুন।</p>
+<p>ধরুন production expected:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>100 concurrent users</code></pre></div>
+<p>Test:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>0 → 50 users
+50 → 100 users
+100 users hold
+100 → 0</code></pre></div>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>stages: [
+  { duration: &#x27;1m&#x27;, target: 50 },
+  { duration: &#x27;1m&#x27;, target: 100 },
+  { duration: &#x27;5m&#x27;, target: 100 },
+  { duration: &#x27;1m&#x27;, target: 0 },
+]</code></pre></div>
+<p>Analyse:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>RPS
+p95
+p99
+Error Rate
+CPU
+RAM
+DB</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-21">
+  <div class="day-head">
+    <div class="day-num">Day 21</div>
+    <h2>Stress + Spike + Soak</h2>
+    <button class="copy-btn" data-target="day-21" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <h3>Stress Test</h3>
+<p>System-এর limit খুঁজুন।</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>100
+↓
+200
+↓
+400
+↓
+800 users</code></pre></div>
+<h3>Spike Test</h3>
+<p>হঠাৎ:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>50
+↓
+1000
+↓
+50</code></pre></div>
+<h3>Soak Test</h3>
+<p>Long duration:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>100 users
+×
+long period</code></pre></div>
+<p>খুঁজবেন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Memory leak
+Connection leak
+Increasing latency
+Database degradation
+Resource exhaustion</code></pre></div>
+  </div>
+</section>
+
+<div class="week-marker" id="week-22"><span>সপ্তাহ ৪ · রিয়েল প্রজেক্ট ও অ্যানালাইসিস</span></div>
+<section class="day-card" id="day-22">
+  <div class="day-head">
+    <div class="day-num">Day 22</div>
+    <h2>Real User Journey</h2>
+    <button class="copy-btn" data-target="day-22" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এখন শুধু endpoint test করবেন না।</p>
+<p>একজন ecommerce user:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Login
+ ↓
+Products
+ ↓
+Search
+ ↓
+Product Details
+ ↓
+Add Cart
+ ↓
+Checkout
+ ↓
+Order</code></pre></div>
+<p>k6:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export default function () {
+
+  group(&#x27;Browse&#x27;, () =&gt; {
+    // products
+  });
+
+  group(&#x27;Cart&#x27;, () =&gt; {
+    // add cart
+  });
+
+  group(&#x27;Checkout&#x27;, () =&gt; {
+    // checkout
+  });
+
+}</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-23">
+  <div class="day-head">
+    <div class="day-num">Day 23</div>
+    <h2>Multiple User Behaviours</h2>
+    <button class="copy-btn" data-target="day-23" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>সব user checkout করবে না।</p>
+<p>Realistic model:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>60% → Browse
+
+20% → Search
+
+12% → Add Cart
+
+6% → Checkout
+
+2% → Purchase</code></pre></div>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const behaviour = Math.random();
+
+if (behaviour &lt; 0.60) {
+
+  browse();
+
+} else if (behaviour &lt; 0.80) {
+
+  search();
+
+} else if (behaviour &lt; 0.92) {
+
+  addToCart();
+
+} else {
+
+  checkout();
+
+}</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-24">
+  <div class="day-head">
+    <div class="day-num">Day 24</div>
+    <h2>Test Data</h2>
+    <button class="copy-btn" data-target="day-24" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এক user দিয়ে 500 users simulate করবেন না।</p>
+<p>Data:</p>
+<div class="code-block" data-lang="json"><div class="code-label">json</div><pre><code>[
+  {
+    &quot;email&quot;: &quot;user1@example.com&quot;,
+    &quot;password&quot;: &quot;password&quot;
+  },
+  {
+    &quot;email&quot;: &quot;user2@example.com&quot;,
+    &quot;password&quot;: &quot;password&quot;
+  }
+]</code></pre></div>
+<p>Random:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>const user =
+  users[Math.floor(Math.random() * users.length)];</code></pre></div>
+<p>শিখবেন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Unique users
+Unique products
+Dynamic IDs
+Random data
+CSV/JSON data</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-25">
+  <div class="day-head">
+    <div class="day-num">Day 25</div>
+    <h2>Custom Metrics</h2>
+    <button class="copy-btn" data-target="day-25" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>k6 custom metrics types:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Counter
+Gauge
+Rate
+Trend</code></pre></div>
+<p>Example:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import { Trend } from &#x27;k6/metrics&#x27;;
+
+const loginDuration =
+  new Trend(&#x27;login_duration&#x27;);
+
+export default function () {
+
+  const res = http.post(...);
+
+  loginDuration.add(
+    res.timings.duration
+  );
+}</code></pre></div>
+<p>Threshold:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>thresholds: {
+  login_duration: [
+    &#x27;p(95)&lt;500&#x27;
+  ],
+}</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-26">
+  <div class="day-head">
+    <div class="day-num">Day 26</div>
+    <h2>Result Analysis</h2>
+    <button class="copy-btn" data-target="day-26" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এটি সবচেয়ে গুরুত্বপূর্ণ দিনগুলোর একটি।</p>
+<p>ধরুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>VUs          200
+
+RPS          500
+
+avg          300ms
+
+p95          850ms
+
+p99          2400ms
+
+error rate   3.5%</code></pre></div>
+<p>Questions:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>p95 কেন বেড়েছে?
+
+কোন endpoint slow?
+
+CPU কি 100%?
+
+Database connections শেষ?
+
+Slow query আছে?
+
+Redis issue?
+
+Network?
+
+Application worker exhausted?</code></pre></div>
+<p>Rule:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>k6 বলে:
+WHAT happened
+
+Monitoring বলে:
+WHY happened</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-27">
+  <div class="day-head">
+    <div class="day-num">Day 27</div>
+    <h2>Grafana + Prometheus</h2>
+    <button class="copy-btn" data-target="day-27" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Architecture:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>        k6
+         │
+         ▼
+    Prometheus
+         │
+         ▼
+      Grafana
+         │
+         ▼
+     Dashboard</code></pre></div>
+<p>k6 results external time-series system-এ stream করা যায়; official outputs-এর মধ্যে Prometheus, Grafana Cloud Prometheus, JSON, CSV, InfluxDB ইত্যাদি রয়েছে।</p>
+<p>Dashboard:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Request Rate
+
+Response Time
+
+p95
+
+p99
+
+Errors
+
+Active VUs
+
+Iterations</code></pre></div>
+<p>এর পাশাপাশি server:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>CPU
+RAM
+Disk
+Network
+Database
+Redis</code></pre></div>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-28">
+  <div class="day-head">
+    <div class="day-num">Day 28</div>
+    <h2>Docker + k6</h2>
+    <button class="copy-btn" data-target="day-28" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Docker image:</p>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>docker pull grafana/k6</code></pre></div>
+<p>Run:</p>
+<div class="code-block" data-lang="bash"><div class="code-label">bash</div><pre><code>docker run --rm -i grafana/k6 run - &lt; script.js</code></pre></div>
+<p>Official k6 distribution-এ Docker image supported।</p>
+<p>নিজের lab বানান:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>docker-compose
+│
+├── API
+├── Database
+├── Redis
+├── Prometheus
+├── Grafana
+└── k6</code></pre></div>
+<p>এটা performance engineering শেখার জন্য দারুণ project।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-29">
+  <div class="day-head">
+    <div class="day-num">Day 29</div>
+    <h2>CI/CD + Automated Performance Gate</h2>
+    <button class="copy-btn" data-target="day-29" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>Target architecture:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Developer
+   │
+   ▼
+Git Push
+   │
+   ▼
+GitHub Actions
+   │
+   ▼
+Deploy Staging
+   │
+   ▼
+k6 Smoke Test
+   │
+   ├── PASS → Continue
+   │
+   └── FAIL → Pipeline Fail</code></pre></div>
+<p>Threshold:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+  thresholds: {
+
+    http_req_failed: [
+      &#x27;rate&lt;0.01&#x27;
+    ],
+
+    http_req_duration: [
+      &#x27;p(95)&lt;500&#x27;
+    ],
+
+  },
+};</code></pre></div>
+<p>এটাই performance gate।</p>
+  </div>
+</section>
+
+
+<section class="day-card" id="day-30">
+  <div class="day-head">
+    <div class="day-num">Day 30</div>
+    <h2>Final Real-World Project</h2>
+    <button class="copy-btn" data-target="day-30" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>এটাই আপনার Final Exam.</p>
+<p>Project:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Frontend
+   ↓
+REST API
+   ↓
+Database
+   ↓
+Redis</code></pre></div>
+<p>আপনি k6 দিয়ে test করবেন।</p>
+<h4>Scenario 1 — Browsing</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>100 users
+Product listing
+Product details
+Search</code></pre></div>
+<h4>Scenario 2 — Authentication</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>50 users
+Login
+Profile</code></pre></div>
+<h4>Scenario 3 — Cart</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>30 users
+Add Cart
+Update Cart
+Remove Cart</code></pre></div>
+<h4>Scenario 4 — Checkout</h4>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>10 users
+Checkout
+Order</code></pre></div>
+<h3>Final Project Structure</h3>
+<p>আমি এই structure recommend করি:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>k6-performance-testing/
+│
+├── tests/
+│   ├── smoke.js
+│   ├── load.js
+│   ├── stress.js
+│   ├── spike.js
+│   └── soak.js
+│
+├── scenarios/
+│   ├── auth.js
+│   ├── products.js
+│   ├── cart.js
+│   └── checkout.js
+│
+├── helpers/
+│   ├── auth.js
+│   └── utils.js
+│
+├── data/
+│   ├── users.json
+│   └── products.json
+│
+├── config/
+│   └── thresholds.js
+│
+├── docker-compose.yml
+│
+└── README.md</code></pre></div>
+<h3>Final Load Model</h3>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>                    Users
+                      │
+          ┌───────────┴──────────┐
+          │                      │
+       Browse                  Login
+        60%                     20%
+          │                      │
+          ├──── Search           │
+          │                      │
+       Product                  Profile
+          │
+       Add Cart
+         12%
+          │
+       Checkout
+          6%
+          │
+       Purchase
+          2%</code></pre></div>
+<h3>Final Thresholds</h3>
+<p>শুরুতে realistic target হিসেবে practice project-এ ধরতে পারেন:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>export const options = {
+
+  thresholds: {
+
+    http_req_failed: [
+      &#x27;rate&lt;0.01&#x27;
+    ],
+
+    http_req_duration: [
+      &#x27;p(90)&lt;300&#x27;,
+      &#x27;p(95)&lt;500&#x27;,
+      &#x27;p(99)&lt;1000&#x27;,
+    ],
+
+    checks: [
+      &#x27;rate&gt;0.99&#x27;
+    ],
+
+  },
+
+};</code></pre></div>
+<p>এগুলো universal production requirement নয়। আপনার actual SLO/SLA অনুযায়ী thresholds নির্ধারণ করবেন। k6 thresholds মূলত SLO-type pass/fail criteria codify করার জন্যই ব্যবহার করা হয়।</p>
+  </div>
+</section>
+
+      <div class="week-marker" id="week-extra"><span>অতিরিক্ত মডিউল</span></div>
+      
+<section class="day-card bonus-card" id="bonus-0">
+  <div class="day-head">
+    <div class="day-num">Extra</div>
+    <h2>Bonus — k6 Browser Testing</h2>
+    <button class="copy-btn" data-target="bonus-0" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>API/protocol testing শেষ করার পরে browser-level performance testing শিখবেন।</p>
+<p>বর্তমান k6-এর <code class="inline">k6/browser</code> module Chromium browser চালিয়ে page interaction এবং frontend performance test করতে পারে।</p>
+<p>Basic:</p>
+<div class="code-block" data-lang="javascript"><div class="code-label">javascript</div><pre><code>import { browser } from &#x27;k6/browser&#x27;;
+
+export const options = {
+  scenarios: {
+    browser_test: {
+      executor: &#x27;shared-iterations&#x27;,
+
+      options: {
+        browser: {
+          type: &#x27;chromium&#x27;,
+        },
+      },
+    },
+  },
+};
+
+export default async function () {
+
+  const page = await browser.newPage();
+
+  try {
+
+    await page.goto(
+      &#x27;https://test.k6.io/&#x27;
+    );
+
+  } finally {
+
+    await page.close();
+
+  }
+
+}</code></pre></div>
+<p>Browser testingটা <strong>Day 30-এর পরে advanced module</strong> হিসেবে নিন।</p>
+  </div>
+</section>
+
+<section class="day-card bonus-card" id="bonus-1">
+  <div class="day-head">
+    <div class="day-num">Extra</div>
+    <h2>প্রতিদিন কীভাবে পড়বেন</h2>
+    <button class="copy-btn" data-target="bonus-1" type="button">
+      <svg viewBox="0 0 24 24" class="icon-copy"><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 8H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3M8 8h8v8H8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="copy-label">Copy</span>
+    </button>
+  </div>
+  <div class="day-body">
+    <p>একটি simple নিয়ম follow করুন:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>20% Theory
++
+30% Code দেখা
++
+50% নিজের হাতে Practice</code></pre></div>
+<p>শুধু video/course দেখে k6 শেখা কঠিন। প্রতিদিন script লিখবেন।</p>
+<p>আপনার progression হওয়া উচিত:</p>
+<div class="code-block" data-lang="text"><div class="code-label">text</div><pre><code>Day 1
+&quot;Load testing কী?&quot;
+
+↓
+
+Day 7
+&quot;Threshold লিখতে পারি&quot;
+
+↓
+
+Day 14
+&quot;Authenticated API test করতে পারি&quot;
+
+↓
+
+Day 21
+&quot;Stress/Spike/Soak test করতে পারি&quot;
+
+↓
+
+Day 26
+&quot;Result analyse করতে পারি&quot;
+
+↓
+
+Day 30
+&quot;Complete performance testing project বানাতে পারি&quot;</code></pre></div>
+<h3>সবচেয়ে গুরুত্বপূর্ণ ১০টি skill</h3>
+<ol>
+<li>HTTP requests</li>
+<li>Checks</li>
+<li>Thresholds</li>
+<li>Metrics</li>
+<li>Scenarios</li>
+<li>Executors</li>
+<li>Arrival Rate</li>
+<li>Authentication</li>
+<li>Workload modelling</li>
+<li>Result + server metrics correlation</li>
+</ol>
+<p>এই ১০টা ভালোভাবে শিখে ফেললে আপনার k6 foundation বেশ শক্ত হবে।</p>
+<p><strong>পরের কাজ হিসেবে Day 1 থেকেই হাতে-কলমে শুরু করা সবচেয়ে ভালো।</strong></p>
+  </div>
+</section>
+    </div>
+
+    <footer class="page-footer">
+      k6 Load Testing — 30 Day Bangla Course · প্রতিটি দিনের কার্ড থেকে কনটেন্ট কপি করা যাবে "Copy" বাটনে ক্লিক করে।
+    </footer>
+  </main>
+</div>
+
+<button class="top-btn" id="topBtn" aria-label="Back to top" type="button">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script id="raw-store" type="application/json">{"day-1": "# Day 1 — Performance Testing Fundamentals\n\nআজ coding না করে concept বুঝবেন।\n\n### শিখবেন\n\n* Performance Testing কী\n* Load Testing কী\n* Stress Testing কী\n* Spike Testing কী\n* Soak Testing কী\n* Smoke Testing কী\n* Scalability কী\n* Bottleneck কী\n\n### Example\n\nধরুন আপনার API:\n\n```text\nGET /api/products\n```\n\nNormal traffic:\n\n```text\n20 requests/sec\n```\n\nCampaign launch হলে:\n\n```text\n500 requests/sec\n```\n\nপ্রশ্ন হচ্ছে:\n\n```text\nServer কি 500 RPS নিতে পারবে?\n\nResponse time কত হবে?\n\nDatabase slow হবে?\n\nError আসবে?\n\nCPU/RAM কত বাড়বে?\n```\n\n### আজকের গুরুত্বপূর্ণ terms\n\n```text\nVU = Virtual User\nRPS = Requests Per Second\nLatency = Delay\nResponse Time = Request complete হতে সময়\nThroughput = System কত কাজ process করছে\nError Rate = কত % request fail করছে\np95 = 95% request এই সময়ের মধ্যে complete\np99 = 99% request এই সময়ের মধ্যে complete\n```\n\n### Practice\n\nনিজের ভাষায় লিখুন:\n\n```text\nLoad Test:\nStress Test:\nSpike Test:\nSoak Test:\n```\n", "day-2": "# Day 2 — JavaScript for k6\n\nk6-এর জন্য পুরো JavaScript শেখার দরকার নেই।\n\nশিখুন:\n\n```javascript\nconst\nlet\n\nfunction\n\nif / else\n\nfor\n\narray\n\nobject\n\nJSON\n\ntemplate literals\n\nimport/export\n```\n\n### Example\n\n```javascript\nconst user = {\n  email: 'test@example.com',\n  password: '123456',\n};\n\nconsole.log(user.email);\n```\n\nArray:\n\n```javascript\nconst products = [1, 2, 3, 4];\n\nfor (const product of products) {\n  console.log(product);\n}\n```\n\nFunction:\n\n```javascript\nfunction getUser() {\n  return {\n    id: 1,\n    name: 'Test User',\n  };\n}\n```\n\n### Practice\n\nএকটি object বানান:\n\n```javascript\nconst testConfig = {\n  users: 10,\n  duration: '30s',\n  baseUrl: 'https://example.com',\n};\n```\n", "day-3": "# Day 3 — k6 Install + First Test\n\nk6 Windows, Linux, macOS, Docker এবং standalone binary দিয়ে চালানো যায়।\n\n### Windows\n\nWinget:\n\n```powershell\nwinget install k6 --source winget\n```\n\nChocolatey:\n\n```powershell\nchoco install k6\n```\n\nCheck:\n\n```bash\nk6 version\n```\n\n### Ubuntu\n\n```bash\nsudo apt-get update\nsudo apt-get install k6\n```\n\n### Docker\n\n```bash\ndocker pull grafana/k6\n```\n\n### First script\n\n`first-test.js`\n\n```javascript\nimport http from 'k6/http';\n\nexport default function () {\n  http.get('https://test.k6.io');\n}\n```\n\nRun:\n\n```bash\nk6 run first-test.js\n```\n\nk6-এর standard run syntax `k6 run script.js`।\n\n### Practice\n\nতিনটি GET endpoint call করুন।\n", "day-4": "# Day 4 — VUs, Duration এবং sleep()\n\n```javascript\nimport http from 'k6/http';\nimport { sleep } from 'k6';\n\nexport const options = {\n  vus: 10,\n  duration: '30s',\n};\n\nexport default function () {\n  http.get('https://test.k6.io');\n\n  sleep(1);\n}\n```\n\nএখানে:\n\n```text\nvus: 10\n```\n\nমানে 10 Virtual Users।\n\n```text\nduration: 30s\n```\n\nমানে 30 seconds test চলবে।\n\n### `sleep(1)` কেন?\n\nReal user সাধারণত:\n\n```text\nPage open\n↓\nকিছু পড়ে\n↓\nNext action\n```\n\nএক milliseconds-এর মধ্যে একের পর এক click করে না।\n\nএজন্য think time simulate করা হয়।\n\n### Practice\n\nচালান:\n\n```text\n1 VU\n10 VU\n20 VU\n50 VU\n```\n\nOutput compare করুন।\n", "day-5": "# Day 5 — k6 Metrics বুঝুন\n\nk6 automatically built-in metrics collect করে এবং metrics broadly Counter, Gauge, Rate ও Trend ধরনের হতে পারে।\n\nসবচেয়ে গুরুত্বপূর্ণ:\n\n```text\nhttp_reqs\nhttp_req_duration\nhttp_req_failed\niteration_duration\niterations\nvus\nvus_max\n```\n\nRequest timing:\n\n```text\nhttp_req_blocked\nhttp_req_connecting\nhttp_req_tls_handshaking\nhttp_req_sending\nhttp_req_waiting\nhttp_req_receiving\n```\n\n### সবচেয়ে গুরুত্বপূর্ণ\n\n```text\nhttp_req_duration\n```\n\nএবং:\n\n```text\np(90)\np(95)\np(99)\n```\n\nধরুন:\n\n```text\navg = 200ms\np95 = 900ms\np99 = 2500ms\n```\n\nAverage ভালো মনে হলেও কিছু user খুব slow response পাচ্ছে।\n\n### Practice\n\nএকটি test run করে লিখুন:\n\n```text\nRequests:\nAverage:\np90:\np95:\nError rate:\n```\n", "day-6": "# Day 6 — Checks\n\nChecks functional validation করে।\n\n```javascript\nimport http from 'k6/http';\nimport { check } from 'k6';\n\nexport default function () {\n  const response = http.get('https://test.k6.io');\n\n  check(response, {\n    'status is 200': (r) => r.status === 200,\n  });\n}\n```\n\nMultiple:\n\n```javascript\ncheck(response, {\n  'status 200': (r) => r.status === 200,\n  'body exists': (r) => r.body.length > 0,\n  'under 500ms': (r) => r.timings.duration < 500,\n});\n```\n\n### মনে রাখবেন\n\n```text\nCheck fail\n≠\nAutomatically entire test fail\n```\n\nTest pass/fail policy-এর জন্য Threshold ব্যবহার করবেন।\n", "day-7": "# Day 7 — Thresholds\n\nএটি k6-এর সবচেয়ে গুরুত্বপূর্ণ concepts-এর একটি।\n\nThreshold হচ্ছে performance-এর **pass/fail criteria**। Threshold fail হলে test failed status নিয়ে শেষ হতে পারে।\n\n```javascript\nexport const options = {\n  thresholds: {\n    http_req_failed: ['rate<0.01'],\n    http_req_duration: ['p(95)<500'],\n  },\n};\n```\n\nমানে:\n\n```text\nError rate < 1%\n\n95% requests < 500ms\n```\n\nআরও:\n\n```javascript\nthresholds: {\n  checks: ['rate>0.99'],\n  http_req_duration: [\n    'p(90)<300',\n    'p(95)<500',\n    'p(99)<1000',\n  ],\n}\n```\n\n### Week 1 Project\n\nবানান:\n\n```text\nGET API Load Test\n20 VUs\n1 minute\n\nRules:\np95 < 500ms\nerror < 1%\nstatus = 200\n```\n", "day-8": "# Day 8 — GET API Testing\n\nStructure করুন:\n\n```text\nk6-project/\n│\n├── tests/\n│   └── products.js\n│\n├── config/\n│\n└── data/\n```\n\nTest:\n\n```javascript\nimport http from 'k6/http';\nimport { check, sleep } from 'k6';\n\nconst BASE_URL = 'https://api.example.com';\n\nexport default function () {\n  const res = http.get(`${BASE_URL}/products`);\n\n  check(res, {\n    'products loaded': (r) => r.status === 200,\n  });\n\n  sleep(1);\n}\n```\n", "day-9": "# Day 9 — POST Request\n\n```javascript\nimport http from 'k6/http';\nimport { check } from 'k6';\n\nexport default function () {\n\n  const payload = JSON.stringify({\n    email: 'test@example.com',\n    password: 'password123',\n  });\n\n  const params = {\n    headers: {\n      'Content-Type': 'application/json',\n    },\n  };\n\n  const res = http.post(\n    'https://api.example.com/login',\n    payload,\n    params\n  );\n\n  check(res, {\n    'login success': (r) => r.status === 200,\n  });\n}\n```\n\nশিখুন:\n\n```text\nGET\nPOST\nPUT\nPATCH\nDELETE\n```\n", "day-10": "# Day 10 — JSON Response Parsing\n\nAPI:\n\n```json\n{\n  \"user\": {\n    \"id\": 25\n  },\n  \"token\": \"abc123\"\n}\n```\n\nk6:\n\n```javascript\nconst body = response.json();\n\nconsole.log(body.token);\n```\n\nঅথবা:\n\n```javascript\nconst token = response.json('token');\n```\n\nCheck:\n\n```javascript\ncheck(response, {\n  'token returned': (r) => r.json('token') !== undefined,\n});\n```\n", "day-11": "# Day 11 — Authentication\n\nReal-world flow:\n\n```text\nLogin\n ↓\nGet Token\n ↓\nProfile\n ↓\nProducts\n```\n\nExample:\n\n```javascript\nconst loginRes = http.post(\n  `${BASE_URL}/login`,\n  JSON.stringify({\n    email: 'test@example.com',\n    password: '123456',\n  }),\n  {\n    headers: {\n      'Content-Type': 'application/json',\n    },\n  }\n);\n\nconst token = loginRes.json('token');\n\nconst params = {\n  headers: {\n    Authorization: `Bearer ${token}`,\n  },\n};\n\nhttp.get(`${BASE_URL}/profile`, params);\n```\n\n### Practice flow\n\n```text\nLogin\n→ Profile\n→ Orders\n```\n", "day-12": "# Day 12 — Environment Variables\n\nHardcode করবেন না:\n\n```javascript\nconst BASE_URL = 'https://production.com';\n```\n\nবরং:\n\n```javascript\nconst BASE_URL = __ENV.BASE_URL;\n```\n\nRun:\n\n```bash\nk6 run -e BASE_URL=https://staging.example.com test.js\n```\n\nk6 script environment variables `__ENV` object দিয়ে access করতে পারে।\n\nExample:\n\n```javascript\nconst BASE_URL = __ENV.BASE_URL;\nconst EMAIL = __ENV.EMAIL;\nconst PASSWORD = __ENV.PASSWORD;\n```\n", "day-13": "# Day 13 — Groups & Tags\n\nComplex test organize করুন।\n\n```javascript\nimport { group } from 'k6';\n\nexport default function () {\n\n  group('Authentication', () => {\n    // login\n  });\n\n  group('Products', () => {\n    // product APIs\n  });\n\n  group('Checkout', () => {\n    // checkout APIs\n  });\n}\n```\n\nGroups request/user actions organize করতে সাহায্য করে এবং tags results filter করতে কাজে লাগে।\n\nTags:\n\n```javascript\nhttp.get(`${BASE_URL}/products`, {\n  tags: {\n    endpoint: 'products',\n  },\n});\n```\n", "day-14": "# Day 14 — Test Lifecycle\n\nk6 lifecycle:\n\n```text\nInit\n ↓\nsetup()\n ↓\nVU Code\n ↓\nteardown()\n```\n\nOfficial lifecycle-এ init, optional `setup()`, VU execution এবং optional `teardown()` stages আছে।\n\nExample:\n\n```javascript\nexport function setup() {\n  return {\n    token: 'example',\n  };\n}\n\nexport default function (data) {\n  console.log(data.token);\n}\n\nexport function teardown(data) {\n  console.log('Test completed');\n}\n```\n\n### Week 2 Project\n\nTest করুন:\n\n```text\nLogin\n↓\nProfile\n↓\nProduct List\n↓\nProduct Details\n```\n\nRequirements:\n\n```text\n20 users\n2 minutes\np95 < 500ms\nerrors < 1%\n```\n", "day-15": "# Day 15 — Scenarios\n\nBasic:\n\n```javascript\nvus: 100,\nduration: '5m'\n```\n\nএর চেয়ে professional approach:\n\n```javascript\nexport const options = {\n  scenarios: {\n    browsing_users: {\n      executor: 'constant-vus',\n      vus: 20,\n      duration: '1m',\n    },\n  },\n};\n```\n\nScenarios দিয়ে আলাদা traffic pattern এবং আলাদা test function model করা যায়।\n", "day-16": "# Day 16 — Executors\n\nএগুলো শিখবেন:\n\n```text\nshared-iterations\n\nper-vu-iterations\n\nconstant-vus\n\nramping-vus\n\nconstant-arrival-rate\n\nramping-arrival-rate\n```\n\nএগুলোই বর্তমান official scenario executor families।\n\n### Example\n\n```javascript\nscenarios: {\n  users: {\n    executor: 'constant-vus',\n    vus: 50,\n    duration: '2m',\n  },\n}\n```\n", "day-17": "# Day 17 — Ramping VUs\n\nTraffic:\n\n```text\n0\n↓\n20\n↓\n100\n↓\n200\n↓\n100\n↓\n0\n```\n\nScript:\n\n```javascript\nexport const options = {\n  scenarios: {\n    load_test: {\n      executor: 'ramping-vus',\n\n      startVUs: 0,\n\n      stages: [\n        { duration: '30s', target: 20 },\n        { duration: '1m', target: 100 },\n        { duration: '2m', target: 100 },\n        { duration: '30s', target: 0 },\n      ],\n    },\n  },\n};\n```\n", "day-18": "# Day 18 — Arrival Rate Testing\n\nএখন VUs না, request/work rate দিয়ে load model করবেন।\n\nExample target:\n\n```text\n100 iterations/sec\n```\n\n```javascript\nexport const options = {\n  scenarios: {\n    api_load: {\n      executor: 'constant-arrival-rate',\n\n      rate: 100,\n      timeUnit: '1s',\n\n      duration: '1m',\n\n      preAllocatedVUs: 50,\n      maxVUs: 200,\n    },\n  },\n};\n```\n\nএখানে লক্ষ্য:\n\n```text\nপ্রতি second প্রায় 100 iterations start করা\n```\n\nএটি অনেক API workload-এর জন্য VU-only modelling-এর চেয়ে useful হতে পারে।\n", "day-19": "# Day 19 — Smoke Test\n\nSmoke test প্রথমে করবেন।\n\nExample:\n\n```javascript\nexport const options = {\n  vus: 2,\n  duration: '30s',\n};\n```\n\nPurpose:\n\n```text\nScript কাজ করছে?\n\nAuthentication কাজ করছে?\n\nEndpoint ঠিক আছে?\n\nChecks pass করছে?\n```\n\nLarge load দেওয়ার আগে smoke test করবেন।\n", "day-20": "# Day 20 — Load Test\n\nExpected normal traffic simulate করুন।\n\nধরুন production expected:\n\n```text\n100 concurrent users\n```\n\nTest:\n\n```text\n0 → 50 users\n50 → 100 users\n100 users hold\n100 → 0\n```\n\nExample:\n\n```javascript\nstages: [\n  { duration: '1m', target: 50 },\n  { duration: '1m', target: 100 },\n  { duration: '5m', target: 100 },\n  { duration: '1m', target: 0 },\n]\n```\n\nAnalyse:\n\n```text\nRPS\np95\np99\nError Rate\nCPU\nRAM\nDB\n```\n", "day-21": "# Day 21 — Stress + Spike + Soak\n\n## Stress Test\n\nSystem-এর limit খুঁজুন।\n\n```text\n100\n↓\n200\n↓\n400\n↓\n800 users\n```\n\n## Spike Test\n\nহঠাৎ:\n\n```text\n50\n↓\n1000\n↓\n50\n```\n\n## Soak Test\n\nLong duration:\n\n```text\n100 users\n×\nlong period\n```\n\nখুঁজবেন:\n\n```text\nMemory leak\nConnection leak\nIncreasing latency\nDatabase degradation\nResource exhaustion\n```\n", "day-22": "# Day 22 — Real User Journey\n\nএখন শুধু endpoint test করবেন না।\n\nএকজন ecommerce user:\n\n```text\nLogin\n ↓\nProducts\n ↓\nSearch\n ↓\nProduct Details\n ↓\nAdd Cart\n ↓\nCheckout\n ↓\nOrder\n```\n\nk6:\n\n```javascript\nexport default function () {\n\n  group('Browse', () => {\n    // products\n  });\n\n  group('Cart', () => {\n    // add cart\n  });\n\n  group('Checkout', () => {\n    // checkout\n  });\n\n}\n```\n", "day-23": "# Day 23 — Multiple User Behaviours\n\nসব user checkout করবে না।\n\nRealistic model:\n\n```text\n60% → Browse\n\n20% → Search\n\n12% → Add Cart\n\n6% → Checkout\n\n2% → Purchase\n```\n\nExample:\n\n```javascript\nconst behaviour = Math.random();\n\nif (behaviour < 0.60) {\n\n  browse();\n\n} else if (behaviour < 0.80) {\n\n  search();\n\n} else if (behaviour < 0.92) {\n\n  addToCart();\n\n} else {\n\n  checkout();\n\n}\n```\n", "day-24": "# Day 24 — Test Data\n\nএক user দিয়ে 500 users simulate করবেন না।\n\nData:\n\n```json\n[\n  {\n    \"email\": \"user1@example.com\",\n    \"password\": \"password\"\n  },\n  {\n    \"email\": \"user2@example.com\",\n    \"password\": \"password\"\n  }\n]\n```\n\nRandom:\n\n```javascript\nconst user =\n  users[Math.floor(Math.random() * users.length)];\n```\n\nশিখবেন:\n\n```text\nUnique users\nUnique products\nDynamic IDs\nRandom data\nCSV/JSON data\n```\n", "day-25": "# Day 25 — Custom Metrics\n\nk6 custom metrics types:\n\n```text\nCounter\nGauge\nRate\nTrend\n```\n\nExample:\n\n```javascript\nimport { Trend } from 'k6/metrics';\n\nconst loginDuration =\n  new Trend('login_duration');\n\nexport default function () {\n\n  const res = http.post(...);\n\n  loginDuration.add(\n    res.timings.duration\n  );\n}\n```\n\nThreshold:\n\n```javascript\nthresholds: {\n  login_duration: [\n    'p(95)<500'\n  ],\n}\n```\n", "day-26": "# Day 26 — Result Analysis\n\nএটি সবচেয়ে গুরুত্বপূর্ণ দিনগুলোর একটি।\n\nধরুন:\n\n```text\nVUs          200\n\nRPS          500\n\navg          300ms\n\np95          850ms\n\np99          2400ms\n\nerror rate   3.5%\n```\n\nQuestions:\n\n```text\np95 কেন বেড়েছে?\n\nকোন endpoint slow?\n\nCPU কি 100%?\n\nDatabase connections শেষ?\n\nSlow query আছে?\n\nRedis issue?\n\nNetwork?\n\nApplication worker exhausted?\n```\n\nRule:\n\n```text\nk6 বলে:\nWHAT happened\n\nMonitoring বলে:\nWHY happened\n```\n", "day-27": "# Day 27 — Grafana + Prometheus\n\nArchitecture:\n\n```text\n        k6\n         │\n         ▼\n    Prometheus\n         │\n         ▼\n      Grafana\n         │\n         ▼\n     Dashboard\n```\n\nk6 results external time-series system-এ stream করা যায়; official outputs-এর মধ্যে Prometheus, Grafana Cloud Prometheus, JSON, CSV, InfluxDB ইত্যাদি রয়েছে।\n\nDashboard:\n\n```text\nRequest Rate\n\nResponse Time\n\np95\n\np99\n\nErrors\n\nActive VUs\n\nIterations\n```\n\nএর পাশাপাশি server:\n\n```text\nCPU\nRAM\nDisk\nNetwork\nDatabase\nRedis\n```\n", "day-28": "# Day 28 — Docker + k6\n\nDocker image:\n\n```bash\ndocker pull grafana/k6\n```\n\nRun:\n\n```bash\ndocker run --rm -i grafana/k6 run - < script.js\n```\n\nOfficial k6 distribution-এ Docker image supported।\n\nনিজের lab বানান:\n\n```text\ndocker-compose\n│\n├── API\n├── Database\n├── Redis\n├── Prometheus\n├── Grafana\n└── k6\n```\n\nএটা performance engineering শেখার জন্য দারুণ project।\n", "day-29": "# Day 29 — CI/CD + Automated Performance Gate\n\nTarget architecture:\n\n```text\nDeveloper\n   │\n   ▼\nGit Push\n   │\n   ▼\nGitHub Actions\n   │\n   ▼\nDeploy Staging\n   │\n   ▼\nk6 Smoke Test\n   │\n   ├── PASS → Continue\n   │\n   └── FAIL → Pipeline Fail\n```\n\nThreshold:\n\n```javascript\nexport const options = {\n  thresholds: {\n\n    http_req_failed: [\n      'rate<0.01'\n    ],\n\n    http_req_duration: [\n      'p(95)<500'\n    ],\n\n  },\n};\n```\n\nএটাই performance gate।\n", "day-30": "# Day 30 — Final Real-World Project\n\nএটাই আপনার Final Exam.\n\nProject:\n\n```text\nFrontend\n   ↓\nREST API\n   ↓\nDatabase\n   ↓\nRedis\n```\n\nআপনি k6 দিয়ে test করবেন।\n\n### Scenario 1 — Browsing\n\n```text\n100 users\nProduct listing\nProduct details\nSearch\n```\n\n### Scenario 2 — Authentication\n\n```text\n50 users\nLogin\nProfile\n```\n\n### Scenario 3 — Cart\n\n```text\n30 users\nAdd Cart\nUpdate Cart\nRemove Cart\n```\n\n### Scenario 4 — Checkout\n\n```text\n10 users\nCheckout\nOrder\n```\n\n## Final Project Structure\n\nআমি এই structure recommend করি:\n\n```text\nk6-performance-testing/\n│\n├── tests/\n│   ├── smoke.js\n│   ├── load.js\n│   ├── stress.js\n│   ├── spike.js\n│   └── soak.js\n│\n├── scenarios/\n│   ├── auth.js\n│   ├── products.js\n│   ├── cart.js\n│   └── checkout.js\n│\n├── helpers/\n│   ├── auth.js\n│   └── utils.js\n│\n├── data/\n│   ├── users.json\n│   └── products.json\n│\n├── config/\n│   └── thresholds.js\n│\n├── docker-compose.yml\n│\n└── README.md\n```\n\n## Final Load Model\n\n```text\n                    Users\n                      │\n          ┌───────────┴──────────┐\n          │                      │\n       Browse                  Login\n        60%                     20%\n          │                      │\n          ├──── Search           │\n          │                      │\n       Product                  Profile\n          │\n       Add Cart\n         12%\n          │\n       Checkout\n          6%\n          │\n       Purchase\n          2%\n```\n\n## Final Thresholds\n\nশুরুতে realistic target হিসেবে practice project-এ ধরতে পারেন:\n\n```javascript\nexport const options = {\n\n  thresholds: {\n\n    http_req_failed: [\n      'rate<0.01'\n    ],\n\n    http_req_duration: [\n      'p(90)<300',\n      'p(95)<500',\n      'p(99)<1000',\n    ],\n\n    checks: [\n      'rate>0.99'\n    ],\n\n  },\n\n};\n```\n\nএগুলো universal production requirement নয়। আপনার actual SLO/SLA অনুযায়ী thresholds নির্ধারণ করবেন। k6 thresholds মূলত SLO-type pass/fail criteria codify করার জন্যই ব্যবহার করা হয়।\n", "bonus-0": "# Bonus — k6 Browser Testing\n\nAPI/protocol testing শেষ করার পরে browser-level performance testing শিখবেন।\n\nবর্তমান k6-এর `k6/browser` module Chromium browser চালিয়ে page interaction এবং frontend performance test করতে পারে।\n\nBasic:\n\n```javascript\nimport { browser } from 'k6/browser';\n\nexport const options = {\n  scenarios: {\n    browser_test: {\n      executor: 'shared-iterations',\n\n      options: {\n        browser: {\n          type: 'chromium',\n        },\n      },\n    },\n  },\n};\n\nexport default async function () {\n\n  const page = await browser.newPage();\n\n  try {\n\n    await page.goto(\n      'https://test.k6.io/'\n    );\n\n  } finally {\n\n    await page.close();\n\n  }\n\n}\n```\n\nBrowser testingটা **Day 30-এর পরে advanced module** হিসেবে নিন।\n", "bonus-1": "# প্রতিদিন কীভাবে পড়বেন\n\nএকটি simple নিয়ম follow করুন:\n\n```text\n20% Theory\n+\n30% Code দেখা\n+\n50% নিজের হাতে Practice\n```\n\nশুধু video/course দেখে k6 শেখা কঠিন। প্রতিদিন script লিখবেন।\n\nআপনার progression হওয়া উচিত:\n\n```text\nDay 1\n\"Load testing কী?\"\n\n↓\n\nDay 7\n\"Threshold লিখতে পারি\"\n\n↓\n\nDay 14\n\"Authenticated API test করতে পারি\"\n\n↓\n\nDay 21\n\"Stress/Spike/Soak test করতে পারি\"\n\n↓\n\nDay 26\n\"Result analyse করতে পারি\"\n\n↓\n\nDay 30\n\"Complete performance testing project বানাতে পারি\"\n```\n\n## সবচেয়ে গুরুত্বপূর্ণ ১০টি skill\n\n1. HTTP requests\n2. Checks\n3. Thresholds\n4. Metrics\n5. Scenarios\n6. Executors\n7. Arrival Rate\n8. Authentication\n9. Workload modelling\n10. Result + server metrics correlation\n\nএই ১০টা ভালোভাবে শিখে ফেললে আপনার k6 foundation বেশ শক্ত হবে।\n\n**পরের কাজ হিসেবে Day 1 থেকেই হাতে-কলমে শুরু করা সবচেয়ে ভালো।**\n"}</script>
+<script>
+const rawStore = JSON.parse(document.getElementById('raw-store').textContent);
+
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const key = btn.getAttribute('data-target');
+    const text = rawStore[key] || '';
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    const label = btn.querySelector('.copy-label');
+    const prev = label.textContent;
+    btn.classList.add('copied');
+    label.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      label.textContent = prev;
+    }, 1600);
+  });
+});
+
+// mobile drawer
+const mobileToggle = document.getElementById('mobileToggle');
+const sidebar = document.getElementById('sidebar');
+const drawerOverlay = document.getElementById('drawerOverlay');
+const drawerClose = document.getElementById('drawerClose');
+
+function openDrawer(){
+  sidebar.classList.add('open');
+  drawerOverlay.classList.add('visible');
+  requestAnimationFrame(() => drawerOverlay.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+  mobileToggle.setAttribute('aria-expanded', 'true');
+}
+function closeDrawer(){
+  sidebar.classList.remove('open');
+  drawerOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+  mobileToggle.setAttribute('aria-expanded', 'false');
+  setTimeout(() => drawerOverlay.classList.remove('visible'), 220);
+}
+if (mobileToggle) mobileToggle.addEventListener('click', openDrawer);
+if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+document.querySelectorAll('.nav-day').forEach(a => a.addEventListener('click', closeDrawer));
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+window.addEventListener('resize', () => { if (window.innerWidth > 900) closeDrawer(); });
+
+// back to top
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 600);
+});
+topBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+// active nav highlight
+const navLinks = Array.from(document.querySelectorAll('.nav-day'));
+const targets = navLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = '#' + entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+    }
+  });
+}, { rootMargin: '-10% 0px -75% 0px', threshold: 0 });
+targets.forEach(t => io.observe(t));
+</script>
+</body>
+</html>
